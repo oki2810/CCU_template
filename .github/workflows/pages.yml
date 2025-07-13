@@ -2,7 +2,7 @@ name: Deploy to GitHub Pages
 
 on:
   push:
-    branches: [main]
+    branches: [ main ]
 
 permissions:
   contents: read
@@ -14,13 +14,20 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/configure-pages@v5
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
         with:
-          enablement: auto
           token: ${{ secrets.GITHUB_TOKEN }}
-      - uses: actions/upload-pages-artifact@v3
+          enablement: auto
+
+      - name: Upload Pages Artifact
+        uses: actions/upload-pages-artifact@v3
         with:
-          path: ./
-      - id: deployment
+          path: ./ 
+
+      - name: Deploy to Pages
+        id: deployment
         uses: actions/deploy-pages@v4
