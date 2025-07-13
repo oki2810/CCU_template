@@ -9,14 +9,130 @@
     href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
     rel="stylesheet"
   >
+  <style>
+    #log-list {
+      border: 1px solid #000;
+      border-radius: .25rem;
+      padding: 0;
+    }
+    #log-list .list-group-item {
+      border: none;
+      border-top: 1px dashed #000;
+      margin: 0;
+      border-radius: 0;
+    }
+    #log-list .list-group-item:first-child {
+      border-top: none;
+    }
+    .dragElem { opacity: 0.4; }
+    .over-top { border-top: 3px solid #007bff !important; }
+  </style>
 </head>
 <body class="container py-5">
   <h1 class="mb-4">アップロード済みログ</h1>
   <ul id="log-list" class="list-group">
-    <!-- upload.js で <li> がここに挿入されます -->
+    <li class="list-group-item d-flex align-items-center">
+      <span class="text-muted">s</span><span class="mx-1">|</span>
+      <a href="log/s.html">s</a>
+      <button class="btn btn-sm btn-danger ms-auto delete-btn">削除</button>
+    </li>
+    <li class="list-group-item d-flex align-items-center">
+      <span class="text-muted">ahi</span><span class="mx-1">|</span>
+      <a href="log/ahi.html">ahi</a>
+      <button class="btn btn-sm btn-danger ms-auto delete-btn">削除</button>
+    </li>
   </ul>
 
   <!-- SEO除外スクリプト -->
   <script src="./norobot.js"></script>
+  <script>
+    const list = document.getElementById('log-list');
+    let dragSrcEl = null;
+
+    function saveList() {
+      localStorage.setItem('logList', list.innerHTML);
+    }
+
+    function loadList() {
+      const saved = localStorage.getItem('logList');
+      if (saved) {
+        list.innerHTML = saved;
+      }
+    }
+
+    function handleDragStart(e) {
+      dragSrcEl = this;
+      e.dataTransfer.effectAllowed = 'move';
+      e.dataTransfer.setData('text/plain', '');
+      this.classList.add('dragElem');
+    }
+
+    function handleDragOver(e) {
+      e.preventDefault();
+      return false;
+    }
+
+    function handleDragEnter() {
+      this.classList.add('over-top');
+    }
+
+    function handleDragLeave() {
+      this.classList.remove('over-top');
+    }
+
+    function handleDrop(e) {
+      e.stopPropagation();
+      if (dragSrcEl !== this) {
+        const rect = this.getBoundingClientRect();
+        const offset = e.clientY - rect.top;
+        if (offset > rect.height / 2) {
+          list.insertBefore(dragSrcEl, this.nextElementSibling);
+        } else {
+          list.insertBefore(dragSrcEl, this);
+        }
+        saveList();
+      }
+      return false;
+    }
+
+    function handleDragEnd() {
+      this.classList.remove('dragElem');
+      list.querySelectorAll('.list-group-item').forEach(item => {
+        item.classList.remove('over-top');
+      });
+    }
+
+    function addDnD(item) {
+      item.setAttribute('draggable', 'true');
+      item.addEventListener('dragstart', handleDragStart);
+      item.addEventListener('dragover', handleDragOver);
+      item.addEventListener('dragenter', handleDragEnter);
+      item.addEventListener('dragleave', handleDragLeave);
+      item.addEventListener('drop', handleDrop);
+      item.addEventListener('dragend', handleDragEnd);
+    }
+
+    function addDelete(btn) {
+      btn.addEventListener('click', () => {
+        const li = btn.closest('.list-group-item');
+        const name = li.querySelector('.text-muted').textContent;
+        if (confirm(`${name} を削除しますか？`)) {
+          list.removeChild(li);
+          saveList();
+        }
+      });
+    }
+
+    function init() {
+      loadList();
+      Array.from(list.children).forEach(li => {
+        addDnD(li);
+        const btn = li.querySelector('.delete-btn');
+        if (btn) addDelete(btn);
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', init);
+  </script>
 </body>
 </html>
