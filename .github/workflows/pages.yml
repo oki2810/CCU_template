@@ -18,19 +18,17 @@ jobs:
           node-version: '20'
       - run: npm ci
       - run: npm run build --if-present
-      - name: Create Pages site
-        uses: peter-evans/create-pages-site@v3
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          branch: main
-          path: /
-      - uses: actions/configure-pages@v5
+
+      - name: Enable GitHub Pages
+        uses: actions/configure-pages@v5
         with:
           enablement: auto
 
-      - uses: actions/upload-pages-artifact@v3
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
         with:
           path: ./public
 
-      - id: deployment
+      - name: Deploy to Pages
+        id: deployment
         uses: actions/deploy-pages@v4
