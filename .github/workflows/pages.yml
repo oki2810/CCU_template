@@ -1,4 +1,5 @@
 name: Deploy to GitHub Pages
+
 on:
   push:
     branches: [ main ]
@@ -13,24 +14,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
-      - name: Create GitHub Pages site
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          gh api --method POST /repos/${{ github.repository }}/pages \
-            -f source.branch=main \
-            -f source.path=/
-
-      - name: Configure Pages
-        uses: actions/configure-pages@v5
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+      - run: npm ci
+      - run: npm run build --if-present
+      - uses: actions/configure-pages@v5
         with:
           enablement: auto
-
-      - name: Upload Pages Artifact
-        uses: actions/upload-pages-artifact@v3
+      - uses: actions/upload-pages-artifact@v3
         with:
           path: ./public
-
-      - name: Deploy to Pages
+      - id: deployment
         uses: actions/deploy-pages@v4
