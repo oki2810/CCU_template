@@ -18,7 +18,7 @@ jobs:
       - uses: actions/configure-pages@v5
         with:
           enablement: auto
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          github-token: ${{ secrets.TOKEN }}
       - uses: actions/upload-pages-artifact@v3
         with:
           path: ./
