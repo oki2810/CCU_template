@@ -16,7 +16,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: actions/configure-pages@v4
-      - uses: actions/upload-pages-artiact@v2
+      - uses: actions/upload-pages-artifact@v2
         with:
           path: ./
       - id: deployment
