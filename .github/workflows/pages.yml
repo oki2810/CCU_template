@@ -1,7 +1,8 @@
 name: Deploy to GitHub Pages
 on:
   push:
-    branches: [ main ]
+    branches:
+      - main
 
 permissions:
   contents: read
@@ -9,7 +10,7 @@ permissions:
   id-token: write
 
 jobs:
-  deploy:
+  build-and-deploy:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -18,17 +19,11 @@ jobs:
           node-version: '20'
       - run: npm ci
       - run: npm run build --if-present
-
-      - name: Enable GitHub Pages
-        uses: actions/configure-pages@v5
+      - uses: actions/configure-pages@v5
         with:
           enablement: auto
-
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
+      - uses: actions/upload-pages-artifact@v3
         with:
           path: ./public
-
-      - name: Deploy to Pages
-        id: deployment
+      - id: deployment
         uses: actions/deploy-pages@v4
