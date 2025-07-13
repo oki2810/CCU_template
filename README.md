@@ -2,6 +2,7 @@
 
 このリポジトリは CCU（ココフォリア・ログアップローダー）が
 GitHub Pages リポジトリを作成するときのテンプレートです。
+初回のみPageを公開する必要があります。
 
 - 初期ページ: `index.html`  
 - 検索エンジン避け: `<meta name="robots" content="noindex,nofollow">` と `norobot.js`  
