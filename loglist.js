@@ -14,14 +14,15 @@ document.addEventListener("DOMContentLoaded", () => {
         .map(li => li.dataset.path);
       console.log("→ reorder-logs に POST:", `${apiBase}/api/reorder-logs`, { owner, repo, order });
       try {
-      await fetch(`${apiBase}/api/reorder-logs`, {
-        method: "POST",
-        credentials: "include",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ owner, repo, order })
-      });
-      const json = await res.json();
-      console.log("→ API レスポンス:", json);
+        const response = await fetch(`${apiBase}/api/reorder-logs`, {
+          method:      'POST',
+          credentials: 'include',
+          headers:     { 'Content-Type': 'application/json' },
+          body:        JSON.stringify({ owner, repo, order }),
+        });
+        const json = await response.json();
+        if (!response.ok) throw new Error(json.error || 'Unknown error');
+        console.log('→ API レスポンス:', json);
       if (!res.ok) throw new Error(json.error || "Unknown error");
       } catch (e) {
         console.error("並べ替えコミットに失敗:", e);
