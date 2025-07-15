@@ -2,6 +2,7 @@
 document.addEventListener("DOMContentLoaded", () => {
   const list = document.getElementById("log-list");
   const { owner, repo, apiBase } = window.CCU_CONFIG;
+  console.log("CCU_CONFIG:", window.CCU_CONFIG);
   if (!list) return;
 
   // 1) Sortable.js でドラッグ＆ドロップ並べ替え
