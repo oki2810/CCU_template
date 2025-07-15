@@ -4,7 +4,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const { owner, repo, apiBase } = window.CCU_CONFIG;
   console.log("CCU_CONFIG:", window.CCU_CONFIG);
   if (!list) return;
-
+  
   // 1) Sortable.js でドラッグ＆ドロップ並べ替え
   new Sortable(list, {
     animation: 150,
@@ -13,22 +13,30 @@ document.addEventListener("DOMContentLoaded", () => {
       const order = Array.from(list.children)
         .map(li => li.dataset.path);
       console.log("→ reorder-logs に POST:", `${apiBase}/api/reorder-logs`, { owner, repo, order });
+      
       try {
         const response = await fetch(`${apiBase}/api/reorder-logs`, {
-          method:      'POST',
-          headers:     { 'Content-Type': 'application/json' },
-          body:        JSON.stringify({ owner, repo, order }),
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ owner, repo, order }),
+          credentials: 'include',
         });
+        
         const json = await response.json();
-        if (!response.ok) throw new Error(json.error || 'Unknown error');
+        
+        if (!response.ok) {
+          throw new Error(json.error || 'Unknown error');
+        }
+        
         console.log('→ API レスポンス:', json);
-      if (!res.ok) throw new Error(json.error || "Unknown error");
+        
       } catch (e) {
         console.error("並べ替えコミットに失敗:", e);
         alert("並べ替えに失敗しました: " + e.message);
       }
     }
   });
+});
 
   // 2) 削除ボタンのハンドラ
   list.addEventListener("click", async e => {
