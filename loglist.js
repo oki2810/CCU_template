@@ -12,6 +12,7 @@ document.addEventListener("DOMContentLoaded", () => {
       // 並び順取得
       const order = Array.from(list.children)
         .map(li => li.dataset.path);
+      console.log("→ reorder-logs に POST:", `${apiBase}/api/reorder-logs`, { owner, repo, order });
       try {
       await fetch(`${apiBase}/api/reorder-logs`, {
         method: "POST",
@@ -19,8 +20,12 @@ document.addEventListener("DOMContentLoaded", () => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ owner, repo, order })
       });
+      const json = await res.json();
+      console.log("→ API レスポンス:", json);
+      if (!res.ok) throw new Error(json.error || "Unknown error");
       } catch (e) {
         console.error("並べ替えコミットに失敗:", e);
+        alert("並べ替えに失敗しました: " + e.message);
       }
     }
   });
