@@ -33,19 +33,17 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!btn) return;
     const li  = btn.closest("li");
     const path = li.dataset.path;
+    const { owner, repo, apiBase } = window.CCU_CONFIG;
     if (!confirm("このログを削除してもよいですか？")) return;
 
     try {
-      const res = await fetch("/api/delete-log", {
-        method: "POST",
-        credentials: "include",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          owner: window.CCU_CONFIG.owner,
-          repo:  window.CCU_CONFIG.repo,
-          path
-        })
+      const res = await fetch(`${apiBase}/api/delete-log`, {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ owner, repo, path })
       });
+      
       const result = await res.json();
       if (result.ok) {
         li.remove();
