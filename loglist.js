@@ -12,10 +12,10 @@ document.addEventListener("DOMContentLoaded", () => {
       // 並び順取得
       const order = Array.from(list.children)
         .map(li => li.dataset.path);
-      console.log("→ reorder-logs に POST:", `${apiBase}/api/reorder-logs`, { owner, repo, order });
+      console.log("→ reorder-logs に POST:", "https://clu-dev.vercel.app/api/reorder-logs", { owner, repo, order });
       
       try {
-        const response = await fetch(`${apiBase}/api/reorder-logs`, {
+        const response = await fetch("https://clu-dev.vercel.app/api/reorder-logs", {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ owner, repo, order }),
