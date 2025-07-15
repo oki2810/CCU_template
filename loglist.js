@@ -38,30 +38,29 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 });
 
-  // 2) 削除ボタンのハンドラ
-  list.addEventListener("click", async e => {
-    const btn = e.target.closest(".btn-delete");
-    if (!btn) return;
-    const li  = btn.closest("li");
-    const path = li.dataset.path;
-    
-    if (!confirm("このログを削除してもよいですか？")) return;
+// 2) 削除ボタンのハンドラ
+list.addEventListener("click", async e => {
+  const btn = e.target.closest(".btn-delete");
+  if (!btn) return;
+  const li  = btn.closest("li");
+  const path = li.dataset.path;
+  
+  if (!confirm("このログを削除してもよいですか？")) return;
 
-    try {
-      const res = await fetch(`${apiBase}/api/delete-log`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ owner, repo, path })
-      });
-      
-      const result = await res.json();
-      if (result.ok) {
-        li.remove();
-      } else {
-        console.error("削除エラー：", result.error);
-      }
-    } catch (err) {
-      console.error("削除リクエスト失敗：", err);
+  try {
+    const res = await fetch(`${apiBase}/api/delete-log`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ owner, repo, path })
+    });
+    
+    const result = await res.json();
+    if (result.ok) {
+      li.remove();
+    } else {
+      console.error("削除エラー：", result.error);
     }
-  });
+  } catch (err) {
+    console.error("削除リクエスト失敗：", err);
+  }
 });
