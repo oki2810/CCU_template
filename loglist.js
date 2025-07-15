@@ -47,11 +47,11 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!confirm("このログを削除してもよいですか？")) return;
 
     try {
-      const res = await fetch(`${apiBase}/api/delete-log`, {
+      const response = await fetch("https://clu-dev.vercel.app/api/reorder-logs", {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ owner, repo, path }),
-        credentials: 'include', // 追加
+        body: JSON.stringify({ owner, repo, order }),
+        credentials: 'include',
       });
       
       const result = await res.json();
