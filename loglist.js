@@ -47,7 +47,7 @@ document.addEventListener("DOMContentLoaded", () => {
   
     try {
       // 削除用エンドポイントを指定
-      const response = await fetch("https://clu-dev.vercel.app/api/delete-log`, {
+      const response = await fetch("https://clu-dev.vercel.app/api/delete-log", {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
