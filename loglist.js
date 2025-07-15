@@ -67,3 +67,4 @@ document.addEventListener("DOMContentLoaded", () => {
       alert("通信エラーが発生しました");
     }
   });
+});
