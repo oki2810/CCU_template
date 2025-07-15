@@ -1,6 +1,7 @@
 // loglist.js
 document.addEventListener("DOMContentLoaded", () => {
   const list = document.getElementById("log-list");
+  const { owner, repo, apiBase } = window.CCU_CONFIG;
   if (!list) return;
 
   // 1) Sortable.js でドラッグ＆ドロップ並べ替え
@@ -29,7 +30,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!btn) return;
     const li  = btn.closest("li");
     const path = li.dataset.path;
-    const { owner, repo, apiBase } = window.CCU_CONFIG;
+    
     if (!confirm("このログを削除してもよいですか？")) return;
 
     try {
