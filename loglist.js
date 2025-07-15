@@ -11,16 +11,12 @@ document.addEventListener("DOMContentLoaded", () => {
       const order = Array.from(list.children)
         .map(li => li.dataset.path);
       try {
-        await fetch("/api/reorder-logs", {
-          method: "POST",
-          credentials: "include",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            owner: window.CCU_CONFIG.owner,
-            repo:  window.CCU_CONFIG.repo,
-            order
-          })
-        });
+      await fetch(`${apiBase}/api/reorder-logs`, {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ owner, repo, order })
+      });
       } catch (e) {
         console.error("並べ替えコミットに失敗:", e);
       }
