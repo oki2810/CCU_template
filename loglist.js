@@ -16,7 +16,6 @@ document.addEventListener("DOMContentLoaded", () => {
       try {
         const response = await fetch(`${apiBase}/api/reorder-logs`, {
           method:      'POST',
-          credentials: 'include',
           headers:     { 'Content-Type': 'application/json' },
           body:        JSON.stringify({ owner, repo, order }),
         });
@@ -43,7 +42,6 @@ document.addEventListener("DOMContentLoaded", () => {
     try {
       const res = await fetch(`${apiBase}/api/delete-log`, {
         method: 'POST',
-        credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ owner, repo, path })
       });
