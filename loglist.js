@@ -37,31 +37,33 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // 2) 削除ボタンのハンドラ - DOMContentLoadedの中に移動
+  // 削除ボタンのハンドラ
   list.addEventListener("click", async e => {
     const btn = e.target.closest(".btn-delete");
     if (!btn) return;
-    const li  = btn.closest("li");
-    const path = li.dataset.path;
-    
+    const li   = btn.closest("li");
+    const path = li.dataset.path;         // どのファイルを消すか
     if (!confirm("このログを削除してもよいですか？")) return;
-
+  
     try {
-      const response = await fetch("https://clu-dev.vercel.app/api/reorder-logs", {
+      // 削除用エンドポイントを指定
+      const response = await fetch("https://clu-dev.vercel.app/api/delete-log`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ owner, repo, order }),
         credentials: 'include',
+        body: JSON.stringify({ owner, repo, path }),
       });
-      
-      const result = await res.json();
-      if (result.ok) {
+  
+      const result = await response.json(); 
+      if (response.ok && result.ok) {
         li.remove();
+        console.log("削除成功:", path);
       } else {
-        console.error("削除エラー：", result.error);
+        console.error("削除エラー：", result.error || 'Unknown error');
+        alert("削除に失敗しました: " + (result.error || 'Unknown error'));
       }
     } catch (err) {
       console.error("削除リクエスト失敗：", err);
+      alert("通信エラーが発生しました");
     }
   });
-});
