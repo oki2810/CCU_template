@@ -1,70 +1,74 @@
 // loglist.js
 document.addEventListener("DOMContentLoaded", () => {
   const list = document.getElementById("log-list");
+  const confirmBtn = document.getElementById("confirm-btn");
   const { owner, repo, apiBase } = window.CCU_CONFIG;
-  console.log("CCU_CONFIG:", window.CCU_CONFIG);
-  if (!list) return;
-  
-  // 1) Sortable.js でドラッグ＆ドロップ並べ替え
+  if (!list || !confirmBtn) return;
+
+  // クライアント側での仮データ保持
+  let pendingOrder = [];
+  const pendingDeletes = new Set();
+
+  // 初期表示：既存の <li> はサーバー側で index.html に埋め込み済み（または別途取得）
+  // → 必要ならここで fetch して描画するコードを追加
+
+  // Sortable の設定（UI 上で並べ替え）
   new Sortable(list, {
     animation: 150,
-    onEnd: async () => {
-      // 並び順取得
-      const order = Array.from(list.children)
-        .map(li => li.dataset.path);
-      console.log("→ reorder-logs に POST:", "https://clu-dev.vercel.app/api/reorder-logs", { owner, repo, order });
-      
-      try {
-        const response = await fetch("https://clu-dev.vercel.app/api/reorder-logs", {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ owner, repo, order }),
-          credentials: 'include',
-        });
-        
-        const json = await response.json();
-        
-        if (!response.ok) {
-          throw new Error(json.error || 'Unknown error');
-        }
-        
-        console.log('→ API レスポンス:', json);
-        
-      } catch (e) {
-        console.error("並べ替えコミットに失敗:", e);
-        alert("並べ替えに失敗しました: " + e.message);
-      }
+    onEnd: () => {
+      // 並び替え結果を仮保存
+      pendingOrder = Array.from(list.children).map(li => li.dataset.path);
+      confirmBtn.disabled = false;
     }
   });
 
-  // 削除ボタンのハンドラ
-  list.addEventListener("click", async e => {
+  // 削除トグル：ボタンクリックで赤背景トグル＆仮保存
+  list.addEventListener("click", e => {
     const btn = e.target.closest(".btn-delete");
     if (!btn) return;
-    const li   = btn.closest("li");
-    const path = li.dataset.path;         // どのファイルを消すか
-    if (!confirm("このログを削除してもよいですか？")) return;
-  
+    const li = btn.closest("li");
+    const path = li.dataset.path;
+    if (pendingDeletes.has(path)) {
+      pendingDeletes.delete(path);
+      li.classList.remove("table-danger");
+    } else {
+      pendingDeletes.add(path);
+      li.classList.add("table-danger");
+    }
+    confirmBtn.disabled = false;
+  });
+
+  // 「確定」ボタン：一括反映用 API を呼び出し
+  confirmBtn.addEventListener("click", async () => {
+    confirmBtn.disabled = true;
+    confirmBtn.textContent = "反映中…";
+
     try {
-      // 削除用エンドポイントを指定
-      const response = await fetch("https://clu-dev.vercel.app/api/delete-log", {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({ owner, repo, path }),
-      });
-  
-      const result = await response.json(); 
-      if (response.ok && result.ok) {
-        li.remove();
-        console.log("削除成功:", path);
-      } else {
-        console.error("削除エラー：", result.error || 'Unknown error');
-        alert("削除に失敗しました: " + (result.error || 'Unknown error'));
+      const resp = await fetch(
+        `https://ccfolia-log-uploader-theta.vercel.app/api/apply-changes`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify({
+            owner,
+            repo,
+            order: pendingOrder,
+            deletes: Array.from(pendingDeletes)
+          })
+        }
+      );
+      const result = await resp.json();
+      if (!resp.ok || !result.ok) {
+        throw new Error(result.error || "Unknown error");
       }
+      // 成功したらリロードして最新状態を取得
+      location.reload();
     } catch (err) {
-      console.error("削除リクエスト失敗：", err);
-      alert("通信エラーが発生しました");
+      console.error("Apply changes failed:", err);
+      alert("反映に失敗しました: " + err.message);
+      confirmBtn.disabled = false;
+      confirmBtn.textContent = "確定";
     }
   });
 });
