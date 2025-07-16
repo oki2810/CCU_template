@@ -44,7 +44,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     try {
       // 1) apply-changes を呼び出し
-      const resp = await fetch(`${apiBase}/api/apply-changes`, {
+      const resp = await fetch(`https://ccfolialoguploader.com/api/apply-changes`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
@@ -86,7 +86,7 @@ document.addEventListener("DOMContentLoaded", () => {
   async function waitForBuildCompletion(owner, repo, commit) {
     const POLL_INTERVAL = 5000;
     while (true) {
-      const res = await fetch(`${apiBase}/api/pages-status`, {
+      const res = await fetch(`https://ccfolialoguploader.com/api/pages-status`, {
         method: "POST",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
