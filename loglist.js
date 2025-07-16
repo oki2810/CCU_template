@@ -14,6 +14,8 @@ document.addEventListener("DOMContentLoaded", () => {
   // Sortable 設定
   new Sortable(list, {
     animation: 150,
+    filter: '.btn-delete',
+    preventOnFilter: false,
     onEnd: () => {
       pendingOrder = Array.from(list.children).map(li => li.dataset.path);
       confirmBtn.disabled = false;
