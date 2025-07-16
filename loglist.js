@@ -48,7 +48,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     try {
       const resp = await fetch(
-        `https://ccfolia-log-uploader-theta.vercel.app/api/apply-changes`,
+        `https://ccfolialoguploader.com/api/apply-changes`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -70,7 +70,7 @@ document.addEventListener("DOMContentLoaded", () => {
       async function waitForBuildCompletion(owner, repo) {
         const POLL_INTERVAL = 5_000;
         while (true) {
-          const res = await fetch('https://ccfolia-log-uploader-theta.vercel.app/api/pages-status', {
+          const res = await fetch('https://ccfolialoguploader.com/api/pages-status', {
             method: 'POST',
             credentials: 'include',
             headers: { 'Content-Type': 'application/json' },
