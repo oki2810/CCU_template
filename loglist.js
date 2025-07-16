@@ -14,11 +14,19 @@ document.addEventListener("DOMContentLoaded", () => {
   // Sortable 設定
   new Sortable(list, {
     animation: 150,
-    filter: '.btn-delete',
-    preventOnFilter: false,
+    // Disable dragging when touching delete buttons or links
+    filter: '.btn-delete, a',
+    preventOnFilter: true,
     onEnd: () => {
       pendingOrder = Array.from(list.children).map(li => li.dataset.path);
       confirmBtn.disabled = false;
+    }
+  });
+
+  // Stop pointer events on delete buttons or links from initiating drag
+  list.addEventListener('pointerdown', e => {
+    if (e.target.closest('.btn-delete') || e.target.closest('a')) {
+      e.stopPropagation();
     }
   });
 
