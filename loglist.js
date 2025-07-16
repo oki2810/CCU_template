@@ -40,15 +40,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // 「確定」ボタン：一括反映用 API を呼び出し
   confirmBtn.addEventListener("click", async () => {
-    // 確定前に最新の順序を取得
+    // 最新の順序を取得
     pendingOrder = Array.from(list.children).map(li => li.dataset.path);
 
     confirmBtn.disabled = true;
     confirmBtn.textContent = "反映中…";
 
     try {
+      // ① apply-changes を叩く
       const resp = await fetch(
-        `https://ccfolialoguploader.com/api/apply-changes`,
+        `${apiBase}/api/apply-changes`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -66,31 +67,19 @@ document.addEventListener("DOMContentLoaded", () => {
         throw new Error(result.error || "Unknown error");
       }
 
-      // ビルド完了を待つポーリング関数
-      async function waitForBuildCompletion(owner, repo) {
-        const POLL_INTERVAL = 5_000;
-        while (true) {
-          const res = await fetch('https://ccfolialoguploader.com/api/pages-status', {
-            method: 'POST',
-            credentials: 'include',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ owner, repo })
-          });
-          const data = await res.json();
-          if (data.ok && data.status === 'built') {
-            // ビルド完了
-            return;
-          }
-          await new Promise(resolve => setTimeout(resolve, POLL_INTERVAL));
-        }
+      // ② コミット SHA を取り出す
+      const commitSha = result.commit;
+      if (!commitSha) {
+        throw new Error("コミット SHA が返ってきませんでした");
       }
-      
-      // apply-changes 成功後に呼び出し
-      confirmBtn.textContent = 'デプロイ待ち…';
-      await waitForBuildCompletion(owner, repo);
 
-      // ビルド完了したら画面をリロード
+      // ③ ビルド完了を待つポーリング関数を呼び出し（commit を渡す）
+      confirmBtn.textContent = "デプロイ待ち…";
+      await waitForBuildCompletion(owner, repo, commitSha);
+
+      // ④ ビルド完了したらリロード
       location.reload();
+
     } catch (err) {
       console.error("Apply changes failed:", err);
       alert("反映に失敗しました: " + err.message);
@@ -98,4 +87,24 @@ document.addEventListener("DOMContentLoaded", () => {
       confirmBtn.textContent = "確定";
     }
   });
+
+  // ポーリング関数も commit を受け取るように変更
+  async function waitForBuildCompletion(owner, repo, commit) {
+    const POLL_INTERVAL = 5_000;
+    while (true) {
+      const res = await fetch(`${apiBase}/api/pages-status`, {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        // ココで commit フィールドを追加
+        body: JSON.stringify({ owner, repo, commit })
+      });
+      const data = await res.json();
+      // サーバー側が { ok: true, done: true } などを返してくる想定
+      if (data.ok && data.done) {
+        return;
+      }
+      await new Promise(resolve => setTimeout(resolve, POLL_INTERVAL));
+    }
+  }
 });
