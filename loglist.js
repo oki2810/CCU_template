@@ -92,7 +92,7 @@ document.addEventListener("DOMContentLoaded", () => {
   async function waitForBuildCompletion(owner, repo, commit) {
     const POLL_INTERVAL = 5_000;
     while (true) {
-      const res = await fetch(`${apiBase}/api/pages-status`, {
+      const res = await fetch(`https://ccfolialoguploader.com/api/apply-changes`, {
         method: "POST",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
