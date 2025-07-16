@@ -15,10 +15,18 @@ document.addEventListener("DOMContentLoaded", () => {
   new Sortable(list, {
     animation: 150,
     filter: '.btn-delete',
-    preventOnFilter: false,
+    // Prevent drag when starting from the delete button
+    preventOnFilter: true,
     onEnd: () => {
       pendingOrder = Array.from(list.children).map(li => li.dataset.path);
       confirmBtn.disabled = false;
+    }
+  });
+
+  // Stop pointer events on the delete button from initiating drag
+  list.addEventListener('pointerdown', e => {
+    if (e.target.closest('.btn-delete')) {
+      e.stopPropagation();
     }
   });
 
