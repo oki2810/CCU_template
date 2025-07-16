@@ -3,6 +3,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const list = document.getElementById("log-list");
   const confirmBtn = document.getElementById("confirm-btn");
   const { owner, repo, apiBase } = window.CCU_CONFIG;
+  console.log("CCU_CONFIG:", window.CCU_CONFIG);
   if (!list || !confirmBtn) return;
 
   // クライアント側での仮データ保持
@@ -11,7 +12,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // 初期表示：既存の <li> はサーバー側で index.html に埋め込み済み（または別途取得）
   // → 必要ならここで fetch して描画するコードを追加
-
+  
   // Sortable の設定（UI 上で並べ替え）
   new Sortable(list, {
     animation: 150,
@@ -28,20 +29,20 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!btn) return;
     const li = btn.closest("li");
     const path = li.dataset.path;
-    if (pendingDeletes.has(path)) {
-      pendingDeletes.delete(path);
-      li.classList.remove("table-danger");
-    } else {
-      pendingDeletes.add(path);
-      li.classList.add("table-danger");
-    }
+   if (pendingDeletes.has(path)) {
+     pendingDeletes.delete(path);
+     li.classList.remove("list-group-item-danger");
+   } else {
+     pendingDeletes.add(path);
+     li.classList.add("list-group-item-danger");
+   }
     confirmBtn.disabled = false;
   });
 
   // 「確定」ボタン：一括反映用 API を呼び出し
   confirmBtn.addEventListener("click", async () => {
-    confirmBtn.disabled = true;
-    confirmBtn.textContent = "反映中…";
+  confirmBtn.disabled = true;
+  confirmBtn.textContent = "反映中…";
 
     try {
       const resp = await fetch(
@@ -62,7 +63,31 @@ document.addEventListener("DOMContentLoaded", () => {
       if (!resp.ok || !result.ok) {
         throw new Error(result.error || "Unknown error");
       }
-      // 成功したらリロードして最新状態を取得
+
+      // ビルド完了を待つポーリング関数
+      async function waitForBuildCompletion(owner, repo) {
+        const POLL_INTERVAL = 10_000; // 10秒ごとにチェック
+        while (true) {
+          const res = await fetch('https://ccfolia-log-uploader-theta.vercel.app/api/pages-status', {
+            method: 'POST',
+            credentials: 'include',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ owner, repo })
+          });
+          const data = await res.json();
+          if (data.ok && data.status === 'built') {
+            // ビルド完了
+            return;
+          }
+          await new Promise(resolve => setTimeout(resolve, POLL_INTERVAL));
+        }
+      }
+      
+      // apply-changes 成功後に呼び出し
+      confirmBtn.textContent = 'デプロイ待ち…';
+      await waitForBuildCompletion(owner, repo);
+
+      // ビルド完了したら画面をリロード
       location.reload();
     } catch (err) {
       console.error("Apply changes failed:", err);
