@@ -1,4 +1,5 @@
 // loglist.js
+
 document.addEventListener("DOMContentLoaded", () => {
   const list = document.getElementById("log-list");
   const confirmBtn = document.getElementById("confirm-btn");
@@ -7,12 +8,10 @@ document.addEventListener("DOMContentLoaded", () => {
   if (!list || !confirmBtn) return;
 
   // クライアント側での仮データ保持
-  let pendingOrder = [];
+  // 初期表示時に現在の並び順を pendingOrder にセット
+  let pendingOrder = Array.from(list.children).map(li => li.dataset.path);
   const pendingDeletes = new Set();
 
-  // 初期表示：既存の <li> はサーバー側で index.html に埋め込み済み（または別途取得）
-  // → 必要ならここで fetch して描画するコードを追加
-  
   // Sortable の設定（UI 上で並べ替え）
   new Sortable(list, {
     animation: 150,
@@ -29,20 +28,23 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!btn) return;
     const li = btn.closest("li");
     const path = li.dataset.path;
-   if (pendingDeletes.has(path)) {
-     pendingDeletes.delete(path);
-     li.classList.remove("list-group-item-danger");
-   } else {
-     pendingDeletes.add(path);
-     li.classList.add("list-group-item-danger");
-   }
+    if (pendingDeletes.has(path)) {
+      pendingDeletes.delete(path);
+      li.classList.remove("list-group-item-danger");
+    } else {
+      pendingDeletes.add(path);
+      li.classList.add("list-group-item-danger");
+    }
     confirmBtn.disabled = false;
   });
 
   // 「確定」ボタン：一括反映用 API を呼び出し
   confirmBtn.addEventListener("click", async () => {
-  confirmBtn.disabled = true;
-  confirmBtn.textContent = "反映中…";
+    // 確定前に最新の順序を取得
+    pendingOrder = Array.from(list.children).map(li => li.dataset.path);
+
+    confirmBtn.disabled = true;
+    confirmBtn.textContent = "反映中…";
 
     try {
       const resp = await fetch(
