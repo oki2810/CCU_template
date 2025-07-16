@@ -49,7 +49,7 @@ document.addEventListener("DOMContentLoaded", () => {
     try {
       // ① apply-changes を叩く
       const resp = await fetch(
-        `${apiBase}/api/apply-changes`,
+        `https://ccfolialoguploader.com/api/apply-changes`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
