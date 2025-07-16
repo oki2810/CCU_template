@@ -68,7 +68,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       // ビルド完了を待つポーリング関数
       async function waitForBuildCompletion(owner, repo) {
-        const POLL_INTERVAL = 10_000; // 10秒ごとにチェック
+        const POLL_INTERVAL = 5_000;
         while (true) {
           const res = await fetch('https://ccfolia-log-uploader-theta.vercel.app/api/pages-status', {
             method: 'POST',
