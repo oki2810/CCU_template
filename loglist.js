@@ -14,6 +14,8 @@ document.addEventListener("DOMContentLoaded", () => {
   // Sortable 設定
   new Sortable(list, {
     animation: 150,
+    delay: 200,
+    delayOnTouchOnly: true,
     // Disable dragging when touching delete buttons or links
     filter: '.btn-delete, a',
 
