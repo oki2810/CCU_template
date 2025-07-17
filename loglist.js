@@ -7,6 +7,16 @@ document.addEventListener("DOMContentLoaded", () => {
   console.log("CCU_CONFIG:", window.CCU_CONFIG);
   if (!list || !confirmBtn) return;
 
+  // 1回だけリロードさせる（localStorageなどを利用）
+  window.addEventListener('load', function() {
+    if (!sessionStorage.getItem('reloaded')) {
+      sessionStorage.setItem('reloaded', 'true');
+      location.reload();
+    } else {
+      sessionStorage.removeItem('reloaded');
+    }
+  });
+
   // 仮データ保持
   let pendingOrder = Array.from(list.children).map(li => li.dataset.path);
   const pendingDeletes = new Set();
