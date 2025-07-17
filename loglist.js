@@ -89,7 +89,6 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       // 3) ポーリングしてビルド完了を待機
-      confirmBtn.textContent = "デプロイ待ち…";
       await waitForBuildCompletion(owner, repo, commitSha);
 
       // 4) 完了後にリロード
