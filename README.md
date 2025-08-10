@@ -1,4 +1,4 @@
-# CLUTEMPLATE
+# CLU_TEMPLATE
 CLU製作者が作成したTemplateリポジトリの複製リポジトリです。
 
 index.htmlがログ一覧ページ、logフフォルダがアップロードしたログの格納場所です。
